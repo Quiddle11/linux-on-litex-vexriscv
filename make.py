@@ -268,6 +268,25 @@ class SDS1104XE(Board):
     def load(self, filename):
         prog = self.platform.create_programmer()
         prog.load_bitstream(filename, device=1)
+        
+# Atlys support -----------------------------------------------------------------------------
+class Atlys(Board):
+    SPIFLASH_PAGE_SIZE    = 256
+    SPIFLASH_SECTOR_SIZE  = 64*kB
+    SPIFLASH_DUMMY_CYCLES = 10
+    soc_kwargs = {
+         "sdram_sys2x":  True, # Use HalfRate SDRAM PHY.
+         "l2_size":      2048, # Reduce l2_size (Not enough blockrams).
+    }
+    def __init__(self):
+        from litex_boards.targets import atlys
+        Board.__init__(self, atlys.BaseSoC, soc_capabilities={
+            # Communication
+            "serial",
+            "ethernet",
+            # Storage
+#            "spiflash"
+        }, bitstream_ext=".bit")        
 
 # QMTECH WuKong support ---------------------------------------------------------------------------
 
@@ -506,6 +525,7 @@ supported_boards = {
     "xcu1525":          XCU1525,
     "qmtech_wukong":    Qmtech_WuKong,
     "sds1104xe":        SDS1104XE,
+    "atlys":            Atlys,
 
     # Lattice
     "versa_ecp5":      VersaECP5,
